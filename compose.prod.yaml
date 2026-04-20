@@ -31,6 +31,7 @@ services:
   # Airflow
   airflow-init:
     <<: *airflow-common
+    container_name: airflow-init
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${AIRFLOW_METADATA_CONN}
@@ -39,6 +40,7 @@ services:
 
   airflow-api-server:
     <<: *airflow-common
+    container_name: airflow-api-server
     command: api-server
     ports:
       - "127.0.0.1:8080:8080"
@@ -46,6 +48,7 @@ services:
 
   airflow-scheduler:
     <<: *airflow-common
+    container_name: airflow-scheduler
     command: scheduler
     restart: always
 
@@ -54,6 +57,7 @@ services:
   # Data Warehouse
   dw:
     image: postgres:17-alpine
+    container_name: dw
     environment:
       - POSTGRES_USER=${DW_USER}
       - POSTGRES_PASSWORD=${DW_PASSWORD}
@@ -74,6 +78,7 @@ services:
   # Dashboard & VIsualization
   metabase:
     image: metabase/metabase:v0.60.1.4
+    container_name: metabase
     volumes:
       - /dev/urandom:/dev/random:ro
     ports:
@@ -101,6 +106,7 @@ services:
   # Metadata for Airflow & Metabase
   metadata:
     image: postgres:17-alpine
+    container_name: metadata
     environment:
       - POSTGRES_USER=${METADATA_USER}
       - POSTGRES_PASSWORD=${METADATA_PASSWORD}

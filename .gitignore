@@ -2,7 +2,7 @@
 .env
 .env.*
 logs/
-metadata/
+metadata/data/
 dw_data/
 .venv/
 uv.lock

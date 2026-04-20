@@ -1,0 +1,16 @@
+# Blacklist
+.env
+.env.*
+logs/
+metadata/
+dw_data/
+.venv/
+uv.lock
+pyproject.toml
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Whitelist
+!.env.example
+

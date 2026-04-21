@@ -6,17 +6,13 @@ from airflow.providers.fab.auth_manager.security_manager.override import (
 
 AUTH_TYPE = AUTH_OAUTH
 AUTH_USER_REGISTRATION = True
-AUTH_USER_REGISTRATION_ROLE = "Viewer"  # Default role untuk user baru
+AUTH_USER_REGISTRATION_ROLE = "Viewer"
 
-# Ambil dari environment variable
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_AUTH_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_AUTH_CLIENT_SECRET")
 
 if not GOOGLE_CLIENT_ID or not GOOGLE_CLIENT_SECRET:
-    raise ValueError(
-        "GOOGLE_AUTH_CLIENT_ID and GOOGLE_AUTH_CLIENT_SECRET "
-        "must be set in environment variables"
-    )
+    raise ValueError("GOOGLE_AUTH_CLIENT_ID and GOOGLE_AUTH_CLIENT_SECRET must be set")
 
 OAUTH_PROVIDERS = [
     {
@@ -27,21 +23,21 @@ OAUTH_PROVIDERS = [
             "client_id": GOOGLE_CLIENT_ID,
             "client_secret": GOOGLE_CLIENT_SECRET,
             "api_base_url": "https://www.googleapis.com/oauth2/v2/",
-            "client_kwargs": {"scope": "openid email profile"},
+            "client_kwargs": {
+                "scope": "openid email profile",
+                "code_challenge_method": None,
+            },
             "access_token_url": "https://oauth2.googleapis.com/token",
             "authorize_url": "https://accounts.google.com/o/oauth2/auth",
             "request_token_url": None,
+            "server_metadata_url": "https://accounts.google.com/.well-known/openid-configuration",
         },
     }
 ]
 
-ADMIN_EMAILS = {
-    "yudafihan@student.uns.ac.id",
-}
-
-ALLOWED_DOMAINS = {
-    "student.uns.ac.id",
-}
+# Custom Security Manager
+ADMIN_EMAILS = {"yudafihan@student.uns.ac.id"}
+ALLOWED_DOMAINS = {"student.uns.ac.id"}
 
 
 class CustomSecurityManager(FabAirflowSecurityManagerOverride):
@@ -66,5 +62,4 @@ class CustomSecurityManager(FabAirflowSecurityManagerOverride):
 
 
 SECURITY_MANAGER_CLASS = CustomSecurityManager
-
 AUTH_ROLES_SYNC_AT_LOGIN = True

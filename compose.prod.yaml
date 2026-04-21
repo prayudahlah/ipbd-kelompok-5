@@ -55,6 +55,18 @@ services:
     command: scheduler
     restart: always
 
+  airflow-triggerer:
+    <<: *airflow-common
+    container_name: airflow-triggerer
+    command: triggerer
+    restart: always
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    container_name: airflow-dag-processor
+    command: dag-processor
+    restart: always
+
   # ---------------------------------------------------------------------------------------------------
 
   # Data Warehouse

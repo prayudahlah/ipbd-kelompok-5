@@ -35,19 +35,31 @@ services:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${AIRFLOW_METADATA_CONN}
       - _AIRFLOW_DB_MIGRATE=true
-    restart: on-failure
+    restart: unless-stopped
 
   airflow-api-server:
     <<: *airflow-common
     command: api-server
     ports:
       - "127.0.0.1:8080:8080"
-    restart: always
+    restart: unless-stopped
 
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
-    restart: always
+    restart: unless-stopped
+
+  airflow-triggerer:
+    <<: *airflow-common
+    container_name: airflow-triggerer
+    command: triggerer
+    restart: unless-stopped
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    container_name: airflow-dag-processor
+    command: dag-processor
+    restart: unless-stopped
 
   # ---------------------------------------------------------------------------------------------------
 
@@ -60,7 +72,7 @@ services:
       - POSTGRES_DB=${DW_DB}
     volumes:
       - ./dw_data:/var/lib/postgresql/data
-    restart: always
+    restart: unless-stopped
     networks:
       - internal
     healthcheck:
@@ -85,6 +97,7 @@ services:
       MB_DB_USER: ${METADATA_USER}
       MB_DB_PASS: ${METADATA_PASSWORD}
       MB_DB_HOST: ${METADATA_HOST}
+    restart: unless-stopped
     networks:
       - internal
     depends_on:
@@ -109,7 +122,7 @@ services:
     volumes:
       - ./metadata/data:/var/lib/postgresql/data
       - ./metadata/init:/docker-entrypoint-initdb.d
-    restart: always
+    restart: unless-stopped
     networks:
       - internal
     healthcheck:

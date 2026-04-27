@@ -35,7 +35,7 @@ services:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${AIRFLOW_METADATA_CONN}
       - _AIRFLOW_DB_MIGRATE=true
-    restart: unless-stopped
+    restart: on-failure
 
   airflow-api-server:
     <<: *airflow-common

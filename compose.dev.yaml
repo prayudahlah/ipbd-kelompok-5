@@ -63,6 +63,46 @@ services:
 
   # ---------------------------------------------------------------------------------------------------
 
+  # Data Lake
+  garage-init:
+    build:
+      context: ./garage/init
+      dockerfile: Dockerfile
+    restart: on-failure
+    environment:
+      - GARAGE_ADMIN_TOKEN=${GARAGE_ADMIN_TOKEN}
+      - GARAGE_ADMIN_API=${GARAGE_ADMIN_API:-http://garage:3903}
+      - GARAGE_NODE_CAPACITY=${GARAGE_NODE_CAPACITY:-1000000000}
+      - BUCKET_NAME=${BUCKET_NAME:-ipbd-kelompok-5}
+    volumes:
+      - ./garage:/mnt/garage
+    entrypoint: ["/bin/sh", "/usr/local/bin/garage-init.sh"]
+    depends_on:
+      garage:
+        condition: service_healthy
+
+  garage:
+    image: dxflrs/garage:v2.3.0
+    restart: unless-stopped
+    ports:
+      - 3900:3900 # S3 API
+      - 3903:3903 # Admin API
+    environment:
+      - GARAGE_RPC_SECRET=${GARAGE_RPC_SECRET}
+      - GARAGE_ADMIN_TOKEN=${GARAGE_ADMIN_TOKEN}
+    volumes:
+      - ./garage/garage.toml:/etc/garage.toml:ro
+      - ./garage/meta:/var/lib/garage/meta
+      - ./garage/data:/var/lib/garage/data
+    healthcheck:
+      test: ["CMD", "/garage", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------------------------------
+
   # Data Warehouse
   dw:
     image: postgres:17-alpine
@@ -80,10 +120,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
+      
   # ---------------------------------------------------------------------------------------------------
 
-  # Dashboard & VIsualization
+  # Dashboard & Visualization
   metabase:
     image: metabase/metabase:v0.60.1.4
     volumes:

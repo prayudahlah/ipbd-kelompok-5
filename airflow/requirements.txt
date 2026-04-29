@@ -1,6 +1,9 @@
+urllib3==1.26.15
 asyncpg
 psycopg2-binary
 pandas
 requests
 pytrends
 GoogleNews
+polars
+boto3

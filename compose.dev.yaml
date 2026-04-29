@@ -5,17 +5,26 @@ x-airflow-common:
   environment:
     - AIRFLOW__CORE__EXECUTOR=LocalExecutor
     - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${AIRFLOW_METADATA_CONN}
+    - AIRFLOW__CORE__EXECUTION_API_SERVER_URL=http://airflow-api-server:8080/execution
+    - AIRFLOW__API_AUTH__JWT_SECRET=${AIRFLOW__API_AUTH__JWT_SECRET}
+    - AIRFLOW__API_AUTH__JWT_ISSUER=airflow
     - AIRFLOW__CORE__LOAD_EXAMPLES=False
     - AIRFLOW__CORE__DEFAULT_TIMEZONE=Asia/Jakarta
     - AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS=True
+    - BUCKET_NAME=${BUCKET_NAME}
+    - GARAGE_ENDPOINT_URL=${AWS_ENDPOINT_URL}
+  env_file:
+    - ./garage/.env.garage
   volumes:
-    - ./airflow/dags:/opt/airflow/dags
+    - ./airflow/dags:/opt/airflow/dags:ro
     - ./airflow/logs:/opt/airflow/logs
     - ./airflow/plugins:/opt/airflow/plugins
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     metadata:
       condition: service_healthy
+    garage-init:
+      condition: service_completed_successfully
   networks:
     - internal
   develop:
@@ -24,6 +33,16 @@ x-airflow-common:
         path: ./airflow/requirements.txt
       - action: rebuild
         path: ./airflow/Dockerfile
+      - action: sync
+        path: ./airflow/dags
+        target: /opt/airflow/dags
+        ignore:
+          - __pycache__/
+          - '*.pyc'
+          - .pytest_cache/
+          - tests/
+          - '*.log'
+
 
 services:
   # ---------------------------------------------------------------------------------------------------
@@ -74,6 +93,8 @@ services:
       - GARAGE_ADMIN_API=${GARAGE_ADMIN_API:-http://garage:3903}
       - GARAGE_NODE_CAPACITY=${GARAGE_NODE_CAPACITY:-1000000000}
       - BUCKET_NAME=${BUCKET_NAME:-ipbd-kelompok-5}
+    networks:
+      - internal
     volumes:
       - ./garage:/mnt/garage
     entrypoint: ["/bin/sh", "/usr/local/bin/garage-init.sh"]
@@ -94,12 +115,32 @@ services:
       - ./garage/garage.toml:/etc/garage.toml:ro
       - ./garage/meta:/var/lib/garage/meta
       - ./garage/data:/var/lib/garage/data
+    networks:
+      - internal
     healthcheck:
       test: ["CMD", "/garage", "status"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
+
+  garage-webui:
+    image: khairul169/garage-webui:1.1.0
+    restart: unless-stopped
+    volumes:
+      - ./garage/garage.toml:/etc/garage.toml:ro
+    ports:
+      - 3909:3909
+    environment:
+      - API_BASE_URL=http://garage:3903
+      - S3_ENDPOINT_URL=http://garage:3900
+      - API_ADMIN_KEY=${GARAGE_ADMIN_TOKEN}
+      - AUTH_USER_PASS=${GARAGE_WEBUI_USER}:${GARAGE_WEBUI_HASHED_PASSWORD}
+    networks:
+      - internal
+    depends_on:
+      garage-init:
+        condition: service_completed_successfully
 
   # ---------------------------------------------------------------------------------------------------
 

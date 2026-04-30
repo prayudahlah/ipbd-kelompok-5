@@ -7,3 +7,4 @@ pytrends
 GoogleNews
 polars
 boto3
+yfinance

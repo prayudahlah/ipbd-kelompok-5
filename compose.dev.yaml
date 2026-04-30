@@ -13,6 +13,8 @@ x-airflow-common:
     - AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS=True
     - BUCKET_NAME=${BUCKET_NAME}
     - GARAGE_ENDPOINT_URL=${AWS_ENDPOINT_URL}
+    - GOOGLE_TRENDS_MAX_KEYWORD_RETRIES=${GOOGLE_TRENDS_MAX_KEYWORD_RETRIES}
+    - GOOGLE_TRENDS_SLEEP_SECONDS=${GOOGLE_TRENDS_SLEEP_SECONDS}
   env_file:
     - ./garage/.env.garage
   volumes:
@@ -152,8 +154,11 @@ services:
       - POSTGRES_PASSWORD=${DW_PASSWORD}
       - POSTGRES_DB=${DW_DB}
     volumes:
-      - ./dw_data:/var/lib/postgresql/data
+      - ./dw/data:/var/lib/postgresql/data
+      - ./dw/init:/docker-entrypoint-initdb.d
     restart: unless-stopped
+    ports:
+      - "5432:5432"
     networks:
       - internal
     healthcheck:

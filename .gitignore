@@ -4,6 +4,7 @@
 logs/
 metadata/data/
 dw_data/
+dw/data/
 .venv/
 uv.lock
 pyproject.toml
@@ -13,6 +14,7 @@ __pycache__/
 .python-version
 garage/data/
 garage/meta/
+.idea
 
 # Whitelist
 !.env.example

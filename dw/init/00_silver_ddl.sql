@@ -1,25 +1,5 @@
 CREATE SCHEMA silver;
 
-CREATE TABLE silver.oil_price (
-    date        DATE PRIMARY KEY,
-    close_usd   NUMERIC(10,2),
-    extracted_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE silver.wiki_views (
-    date        DATE PRIMARY KEY,  -- disimpan sebagai tanggal hari pertama bulan
-    views       INT NOT NULL,
-    extracted_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE silver.ev_trends (
-    date        DATE NOT NULL,
-    keyword     VARCHAR(50) NOT NULL,
-    interest    NUMERIC(5,1),
-    extracted_at TIMESTAMPTZ DEFAULT NOW(),
-    PRIMARY KEY (date, keyword)
-);
-
 CREATE TABLE silver.dim_date (
     date        DATE PRIMARY KEY,
     year        INT NOT NULL,

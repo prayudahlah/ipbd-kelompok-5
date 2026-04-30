@@ -1,6 +1,7 @@
 from datetime import datetime
 from airflow.sdk import DAG
 
+from ipbd_kelompok_5.to_silver.task_group import to_silver
 from ipbd_kelompok_5.to_bronze.task_group import to_bronze
 
 with DAG(
@@ -10,5 +11,7 @@ with DAG(
     tags=["kelompok-5", "medallion", "ipbd"],
 ) as dag:
     bronze = to_bronze()
+    silver = to_silver()
 
-    bronze
+    bronze >> silver
+    # silver

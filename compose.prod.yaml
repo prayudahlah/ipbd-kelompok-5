@@ -5,11 +5,21 @@ x-airflow-common:
   environment:
     - AIRFLOW__CORE__EXECUTOR=LocalExecutor
     - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${AIRFLOW_METADATA_CONN}
+    - AIRFLOW__CORE__EXECUTION_API_SERVER_URL=http://airflow-api-server:8080/execution
+    - AIRFLOW__API_AUTH__JWT_SECRET=${AIRFLOW__API_AUTH__JWT_SECRET}
+    - AIRFLOW__API_AUTH__JWT_ISSUER=airflow
     - AIRFLOW__CORE__LOAD_EXAMPLES=False
     - AIRFLOW__CORE__DEFAULT_TIMEZONE=Asia/Jakarta
     - AIRFLOW__CORE__AUTH_MANAGER=airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
     - GOOGLE_AUTH_CLIENT_ID=${GOOGLE_AUTH_CLIENT_ID}
     - GOOGLE_AUTH_CLIENT_SECRET=${GOOGLE_AUTH_CLIENT_SECRET}
+    - BUCKET_NAME=${BUCKET_NAME}
+    - GARAGE_ENDPOINT_URL=${AWS_ENDPOINT_URL}
+    - GOOGLE_TRENDS_MAX_KEYWORD_RETRIES=${GOOGLE_TRENDS_MAX_KEYWORD_RETRIES}
+    - GOOGLE_TRENDS_SLEEP_SECONDS=${GOOGLE_TRENDS_SLEEP_SECONDS}
+    - DW_USER=${DW_USER}
+    - DW_PASSWORD=${DW_PASSWORD}
+    - DW_DB=${DW_DB}
   volumes:
     - ./airflow/dags:/opt/airflow/dags
     - ./airflow/logs:/opt/airflow/logs
@@ -109,8 +119,23 @@ services:
       retries: 3
       start_period: 30s
 
-  # ---------------------------------------------------------------------------------------------------
+  garage-webui:
+    image: khairul169/garage-webui:1.1.0
+    restart: unless-stopped
+    volumes:
+      - ./garage/garage.toml:/etc/garage.toml:ro
+    environment:
+      - API_BASE_URL=http://garage:3903
+      - S3_ENDPOINT_URL=http://garage:3900
+      - API_ADMIN_KEY=${GARAGE_ADMIN_TOKEN}
+      - AUTH_USER_PASS=${GARAGE_WEBUI_USER}:${GARAGE_WEBUI_HASHED_PASSWORD}
+    networks:
+      - internal
+    depends_on:
+      garage-init:
+        condition: service_completed_successfully
 
+  # ---------------------------------------------------------------------------------------------------
 
   # Data Warehouse
   dw:

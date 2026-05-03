@@ -95,6 +95,8 @@ services:
       - BUCKET_NAME=${BUCKET_NAME:-ipbd-kelompok-5}
     volumes:
       - ./garage:/mnt/garage
+    networks:
+      - internal
     entrypoint: ["/bin/sh", "/usr/local/bin/garage-init.sh"]
     depends_on:
       garage:
@@ -114,6 +116,8 @@ services:
       - ./garage/garage.toml:/etc/garage.toml:ro
       - ./garage/meta:/var/lib/garage/meta
       - ./garage/data:/var/lib/garage/data
+    networks:
+      - internal
     healthcheck:
       test: ["CMD", "/garage", "status"]
       interval: 30s

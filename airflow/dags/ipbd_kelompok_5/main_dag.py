@@ -3,6 +3,7 @@ from airflow.sdk import DAG
 
 from ipbd_kelompok_5.to_silver.task_group import to_silver
 from ipbd_kelompok_5.to_bronze.task_group import to_bronze
+from ipbd_kelompok_5.to_gold.task_group import to_gold
 
 with DAG(
     dag_id="ipbd-kelompok-5-pipeline",
@@ -12,6 +13,7 @@ with DAG(
 ) as dag:
     bronze = to_bronze()
     silver = to_silver()
+    gold = to_gold()
 
-    bronze >> silver
+    bronze >> silver >> gold
     # silver

@@ -36,8 +36,8 @@ OAUTH_PROVIDERS = [
 ]
 
 # Custom Security Manager
-ADMIN_EMAILS = {"yudafihan@student.uns.ac.id"}
-ALLOWED_DOMAINS = {"student.uns.ac.id"}
+ADMIN_EMAILS = ["yudafihan@student.uns.ac.id"]
+ALLOWED_DOMAINS = ["student.uns.ac.id", "gmail.com", "staff.uns.ac.id"]
 
 
 class CustomSecurityManager(FabAirflowSecurityManagerOverride):

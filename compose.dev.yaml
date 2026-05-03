@@ -60,6 +60,11 @@ services:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${AIRFLOW_METADATA_CONN}
       - _AIRFLOW_DB_MIGRATE=true
     restart: on-failure
+    depends_on:
+      metadata:
+        condition: service_healthy
+      garage-init:
+        condition: service_completed_successfully
 
   airflow-api-server:
     <<: *airflow-common
@@ -67,23 +72,35 @@ services:
     ports:
       - "127.0.0.1:8080:8080"
     restart: unless-stopped
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
 
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
     restart: unless-stopped
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
 
   airflow-triggerer:
     <<: *airflow-common
     container_name: airflow-triggerer
     command: triggerer
     restart: unless-stopped
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
 
   airflow-dag-processor:
     <<: *airflow-common
     container_name: airflow-dag-processor
     command: dag-processor
     restart: unless-stopped
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
 
   # ---------------------------------------------------------------------------------------------------
 
@@ -161,7 +178,7 @@ services:
       - ./dw/init:/docker-entrypoint-initdb.d
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
       - internal
     healthcheck:

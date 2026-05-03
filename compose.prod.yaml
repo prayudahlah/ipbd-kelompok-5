@@ -20,6 +20,8 @@ x-airflow-common:
     - DW_USER=${DW_USER}
     - DW_PASSWORD=${DW_PASSWORD}
     - DW_DB=${DW_DB}
+  env_file:
+    - ./garage/.env.garage
   volumes:
     - ./airflow/dags:/opt/airflow/dags
     - ./airflow/logs:/opt/airflow/logs

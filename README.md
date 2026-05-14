@@ -20,7 +20,7 @@ Alur utama mengikuti pola arsitektur medallion: bronze (raw) → silver (cleaned
 
 ## Orkestrasi DAG Airflow
 Seluruh tahapan ingestion dan transformasi dijalankan oleh DAG Airflow yang mengatur urutan bronze → silver → gold.
-Tampilan DAG bisa dilihat di https://airflow.ipbd.prayudahlah.dev.
+Tampilan DAG bisa dilihat di https://airflow.ipbd.prayudahlah.dev (Deprecated).
 
 ![DAG Airflow](assets/dag.png)
 
@@ -41,7 +41,7 @@ Data disusun dalam tiga lapisan utama:
 
 ## Output Analitik
 Hasil akhir digunakan untuk analisis tren bulanan, dampak event, serta korelasi EV vs minyak.
-Dashboard publik dapat diakses di https://metabase.ipbd.prayudahlah.dev/public/dashboard/77dd3122-85c8-4a68-869e-04803bc28853.
+Dashboard publik dapat diakses di https://metabase.ipbd.prayudahlah.dev/public/dashboard/77dd3122-85c8-4a68-869e-04803bc28853 (Deprecated).
 
 ![Dashboard Metabase](assets/dashboard.png)
 
